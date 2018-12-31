@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="Author" content="Sophia">
+    <meta name="Keywords" content="">
+    <meta name="Description" content="">
+    <title>选项卡vue-demo</title>
+    <script src="./vue.js"></script>
+    <style>
+        *{margin: 0;padding: 0;}
+        html,body{height: 100%;}
+        html{font-size: 12px;}
+        li{list-style: none;}
+        #app{
+            margin: 0 auto;
+            width: 80%;
+            background-color: #232323;
+        }
+        .tab-tit{
+            display: flex;
+            width: 100%;
+            border: 1px solid #ffa893;
+            box-sizing: border-box;
+        }
+        .tab-tit a{
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            width: 25%;
+            height: 44px;
+            line-height: 44px;
+            text-align: center;
+            font-size: 1.4rem;
+            color: #60ff0b;
+            border-right: 1px solid #ffa893;
+            text-decoration: none;
+        }
+        .tab-tit a:nth-last-of-type(1){border-right: none;}
+        .tab-tit a.active{
+            background-color: #ffa893;
+        }
+        .tab-ctn li{
+            width: 100%;
+            font-size: 2rem;
+            color: #ffa893;
+
+        }
+        .tab-ctn li:nth-of-type(1){background-color: yellow;}
+        .tab-ctn li:nth-of-type(2){background-color: #4c6cff;}
+        .tab-ctn li:nth-of-type(3){background-color: #626262;}
+        .tab-ctn li:nth-of-type(4){background-color: #52ff6a;}
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="tab-tit">
+            <a href="javascript:void(0);" v-for="(a,idx) in anchors" @click="id=idx" :class="{active:id===idx}">{{a}}</a>
+        </div>
+        <ul class="tab-ctn">
+            <li v-for="(item,index) in lists" v-show="id===index">{{item}}</li>
+        </ul>
+    </div>
+    <script>
+        const vm = new Vue({
+            el: '#app',
+            data: {
+                id: 0,
+                anchors: ["首页","分类","购物车","我的"],
+                lists: [
+                    "这里是首页内容","这里是分类内容","这里是购物车内容","这里是我的内容"
+                ]
+            }
+        })
+
+    </script>
+</body>
+</html>
