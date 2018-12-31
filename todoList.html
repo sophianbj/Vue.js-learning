@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="Author" content="Sophia">
+    <meta name="Keywords" content="">
+    <meta name="Description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <title>to do lists</title>
+    <script src="./vue.js"></script>
+    <style>
+        *{margin: 0; padding: 0;}
+        li{list-style: none;}
+        .fl{float: left;}
+        .fr{float: right;}
+        .clearfix{
+            zoom: 1;
+            overflow: hidden;
+        }
+        .clearfix::after,.clearfix::before{
+            content: "";
+            display: block;
+            width: 100%;
+            height: 0;
+            overflow: hidden;
+            visibility: hidden;
+        }
+        html,body{max-height: 100%;}
+        html{font-size: 14px;}
+        body{background-color: rgba(0,0,0,.6);overflow: hidden;}
+        input, button,textarea{
+            border: none;
+            outline: none;
+            box-sizing: border-box;
+        }
+        #app{
+            width: 100%;
+            height: 100%;
+        }
+        .app-btn{
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            text-align: center;
+        }
+        .app-btn .btn{
+            width: 140px;
+            height: 50px;
+            line-height: 50px;
+            font-size: 1.56rem;
+            font-weight: 700;
+            border-radius: 10px;
+            border: 1px solid #ffa893;
+            background-color: #52ff6a;
+            outline: none;
+            cursor: pointer;
+            user-select: none;
+        }
+        .app-portal,.app-lists{
+            text-align: center;
+            color: #52ff6a;
+        }
+        .app-portal .app-tit{
+            padding: 40px  0;
+            font-size: 2.5rem;
+        }
+        .app-portal .app-tips{font-size: 1.42rem;}
+        .app-append .append-list li{
+            width: 100%;
+            padding: 10px 0;
+            font-size: 0;
+        }
+        .app-append .append-list li label{
+            display: inline-block;
+            padding-left: 4px;
+            width: 26%;
+            font-size: 1.32rem;
+            font-weight: 700;
+            color: #52ff6a;
+        }
+        .app-append .append-list li input{
+            padding: 4px ;
+            width: 70%;
+            height: 36px;
+            line-height: 36px;
+            font-size: 1.28rem;
+        }
+        #append-tit{font-weight: 700;}
+        #append-ctn{
+            padding: 4px 10px;
+            width: 100%;
+            border: 1px solid #52ff6a;
+            font-size: 1.34rem;
+            resize: none;
+        }
+        #append-level,#append-level option{
+            width: 40%;
+            height: 30px;
+            line-height: 30px;
+            cursor: pointer;
+        }
+        .app-append .append-btn{
+            width: 100%;
+            height: 42px;
+            line-height: 42px;
+            font-size: 1.64rem;
+            background-color: #52ff6a;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+        .app-btn .btn:active,
+        .app-append .append-btn:active{
+            border: 1px solid #ffed26;
+            box-shadow: 0 0 6px #ff0;
+        }
+        .app-lists .app-tit,
+        .app-lists .goal-ctn,.goal-filter{padding: 10px 0;}
+        .app-lists .app-tit{font-size: 2rem;}
+        .app-lists .goal-ctn,.goal-filter,
+        .app-lists .goal-list li .goal-item p{font-size: 1.26rem;}
+        .app-lists .goal-ctn span{margin: 0 5px;font-weight: 700;}
+        .goal-fulfil,.goal-filter label[for="finish"]{color: yellow;}
+        .goal-tbd,.goal-filter label[for="unfinished"]{color: red;}
+        .app-lists .goal-list li{
+            position: relative;
+            padding: 4px 10px;
+            width: 100%;
+            border-bottom: 1px dotted #52ff6a;
+            box-sizing: border-box;
+        }
+        .app-lists .goal-list li .goal-opt{
+            position: absolute;
+            top: 9px;
+            transform: translateY(50%);
+            margin: auto;
+            width: 18px;
+            height: 18px;
+            line-height: 18px;
+            font-size: 1rem;
+            border: 1px solid #52ff6a;
+            border-radius: 50%;
+            vertical-align: middle;
+        }
+        .app-lists .goal-list li .opt-icon{ left: 10px; }
+        .app-lists .goal-list li .opt-close{ right: 10px; color: red;font-weight: 700;}
+        .app-lists .goal-list li .opt-icon.isCk{background-color: #ff0042;}
+        .app-lists .goal-list li .goal-item{
+            margin: 0 30px;
+            padding: 0 10px;
+            width: calc(100% - 80px);
+            text-align: left;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+            vertical-align: middle;
+        }
+        .app-lists .goal-list li .goal-item h3{
+            margin-bottom: 4px;
+            line-height: 2rem;
+            font-size: 1.55rem;
+            color: #ff0042;
+        }
+        .app-lists .goal-list li.bgc{background-color: darkorchid;}
+        .star-box{
+            position: relative;
+            display: inline-block;
+            width: 76px;
+            height: 20px;
+            background:  url("./star.png");
+            vertical-align: middle;
+        }
+        .star{
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 80%;
+            height: 100%;
+            background: url("./star.png") 0 -27px;
+        }
+        .app-lists .goal-btn{
+            padding: 8px 0;
+            line-height: 1.6rem;
+            font-size: 1rem;
+        }
+        .app-lists .goal-btn span{
+            color: #ff0042;
+            cursor: pointer;
+        }
+        /*.app-append,.app-lists{display: none;}*/
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div id="app-portal" class="app-portal" v-if="isPortal||addGoal.length==0&&!addBtn">
+            <h2 class="app-tit">我的目标列表</h2>
+            <p class="app-tips">当前内容为空，请点击按钮添加</p>
+        </div>
+        <div class="app-append" v-if="addBtn">
+            <add-goal @connect="submitGoal"></add-goal>
+        </div>
+        <div id="app-lists" class="app-lists" v-if="submitGoals&&addGoal.length!=0">
+            <h2 class="app-tit">小目标列表\(^o^)/~</h2>
+            <p class="goal-ctn">共有<span class="goal-total">{{addGoal.length}}</span>个目标，已完成<span class="goal-fulfil">{{finishNum}}</span>个，还有<span class="goal-tbd">{{addGoal.length-finishNum}}</span>个未完成</p>
+            <div class="goal-filter">
+                <input type="radio" id="all" name="goal-type" @click="chooseType(1)"/><label for="all">所有目标</label>
+                <input type="radio" id="finish" name="goal-type" @click="chooseType(2)"/><label for="finish">已完成目标</label>
+                <input type="radio" id="unfinished" name="goal-type" @click="chooseType(3)"/><label for="unfinished">未完成目标</label>
+            </div>
+            <ul class="goal-list">
+                <li v-for="(goal,index) in newGoal" :class="['clearfix',{'bgc':goal.isFinished}]">
+                    <span :class="['goal-opt','opt-icon','fl',{'isCk':goal.isCk}]" @click="goal.isCk=!goal.isCk"></span>
+                    <div class="goal-item fl">
+                        <h3 class="clearfix">
+                            <span class="fl">{{goal.tit}}</span>
+                            <span class="star-box fr"><em class="star" :style="{width: [goal.level*25+'%']}"></em></span></h3>
+                        <p>{{goal.detail}}</p>
+                    </div>
+                    <span class="goal-opt opt-close fr" v-show="goal.isCk" @click="delGoal(index)">X</span>
+                </li>
+            </ul>
+            <div class="goal-btn clearfix" v-if="addGoal.length>0">
+                <span class="fl" @click="finishedCk(addGoal)">已完成目标</span>
+                <span class="fr" @click="deleteCk">删除已选目标</span>
+            </div>
+        </div>
+        <div id="app-btn" class="app-btn" v-show="isPortal||submitGoals"><button class="btn" @click="showAddGoal">新增目标</button></div>
+    </div>
+    <script>
+        Vue.component('add-goal',{
+           template: `<div>
+           <ul class="append-list">
+                <li>
+                    <label for="append-tit">目标主题：</label>
+                    <input id="append-tit" type="text" placeholder="输入小目标标题" v-model="goal.tit"/>
+                </li>
+                <li>
+                    <label for="append-level">轻重缓急：</label>
+                    <select name="append-level" id="append-level" v-model="goal.level">
+                        <option v-for="(opt,idx) in optList" :value="idx+1">{{opt}}</option>
+                    </select>
+                </li>
+                <li>
+                    <label for="append-ctn"></label><textarea name="" id="append-ctn" cols="30" rows="10" placeholder="输入小目标详情" v-model="goal.detail"></textarea>
+                </li>
+            </ul>
+            <button class="append-btn" @click="send">提交</button>
+           </div>` ,
+            data:function(){
+               return {
+                   optList: ["不重要且不紧急","不紧急但重要","紧急但不重要","紧急且重要"],
+                   goal: {
+                       tit: '',
+                       detail: '',
+                       level: '',
+                       isCk: false,
+                       isFinished: false//任务是否完成
+                   }
+               }
+            },
+            methods: {
+                send: function () {
+                    this.$emit('connect',this.goal);
+                }
+            }
+        });
+        const vm = new Vue({
+            el: '#app',
+            data: {
+                addGoal:[],
+                isPortal: true,
+                addBtn: false,
+                submitGoals: false,
+                tempGoal: [],
+                newGoal: []
+            },
+            mounted(){
+                this.newGoal = this.addGoal;
+            },
+            computed: {
+                finishNum: function () {
+                    return this.addGoal.filter(function (val) {
+                        return val.isFinished
+                    }).length;
+                }
+            },
+            methods: {
+                showAddGoal: function () {//点击添加目标按钮时改变各页面间状态
+                    this.isPortal = false;
+                    this.submitGoals = false;
+                    this.addBtn = true;
+                },
+                submitGoal: function (goal) {//添加目标组件部分提交目标
+                    if(goal.tit!=''&&goal.tit.length>0&&goal.detail!=''&&goal.detail.length>0){
+                        if(goal.level==null||goal.level==''){
+                            goal.level = 4;
+                        }
+                        this.addGoal.push(goal);
+                        this.submitGoals = true;
+                        this.addBtn = this.isPortal = false;
+                    }
+                    return goal;
+                },
+                delGoal: function (index) {//删除某一条
+                    this.addGoal.splice(index,1)
+                },
+                finishedCk: function () {//完成已选按钮
+                    this.tempGoal.push(this.addGoal.filter(function(val){
+                        return val.isCk;
+                    }));
+                    for(let i=0;i<this.tempGoal.length;i++){
+                        this.tempGoal[i].every(function (item) {
+                            item.isFinished = true;console.log(item);
+                        });
+                    }
+                },
+                deleteCk: function () {//删除已选目标
+                    this.addGoal = this.addGoal.filter(function(val){
+                        return !val.isCk;
+                    });
+                },
+                chooseType: function (type) {
+                    switch (type){
+                        case 1: this.newGoal = this.addGoal; break;//全选
+                        case 2: this.newGoal = this.addGoal.filter(function(item){return item.isFinished});break;
+                        case 3: this.newGoal = this.addGoal.filter(function(item){return !item.isFinished});break;
+
+                    }
+                }
+            }
+        })
+    </script>
+</body>
+</html>
