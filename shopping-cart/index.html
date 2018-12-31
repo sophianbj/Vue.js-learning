@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="Author" content="Sophia">
+    <meta name="Keywords" content="">
+    <meta name="Description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <title>购物车统计总价vue-demo</title>
+    <link rel="stylesheet" href="./index.css"/>
+    <script src="../vue.js"></script>
+</head>
+<body>
+    <div id="app">
+        <div class="mask" v-if="confirm"></div>
+        <div class="app-tips" v-if="confirm">
+            <div class="tips">
+                <p>共需支付：<span >{{getTotal.price}}</span></p>
+                <h3 class="ask" v-show="!cancel">提交订单?</h3>
+                <button class="confirm" v-show="!cancel" @click="cancel=!cancel">确定</button>
+                <button class="cancel" v-show="confirm" v-if="!cancel" @click="confirm=!confirm">取消</button>
+                <h3 class="committing" v-show="cancel">订单提交中。。。</h3>
+            </div>
+        </div>
+        <div class="app-ctn">
+            <div class="cart-header">
+                <h4 class="cart-pro">购物清单</h4>
+                <ul class="cart-tit clearfix">
+                    <li class="sct-check td-check fl"><span :class="isCkAll?'cked':'ck'" @click="selectAll(isCkAll)"></span>全选</li>
+                    <li class="sct-product td-product fl">商品</li>
+                    <li class="sct-price td-price fl">单价(元)</li>
+                    <li class="sct-num td-num fl">数量</li>
+                    <li class="sct-total td-total fl">金额(元)</li>
+                    <li class="sct-opt td-opt fl">操作</li>
+                </ul>
+            </div>
+            <div class="cart-ctn">
+                <table class="cart-table">
+                    <tbody>
+                    <tr v-for="(good,index) in goods" :key="index" class="cart-tr">
+                        <td class="td-check"><span :class="good.isCk? 'cked':'ck'" @click="good.isCk=!good.isCk"></span></td>
+                        <td class="td-product clearfix">
+                            <img class="fl" :src="good.gImg" :alt="good.gTit" width="80" height="80"/>
+                            <div class="product-info fl">
+                                <h6>{{good.gTit}}</h6>
+                                <p>规格：{{good.gSpec}}</p>
+                            </div>
+                        </td>
+                        <td class="td-price">
+                            <p class="product-price">￥<span>{{good.gPrice}}</span></p>
+                        </td>
+                        <td class="td-num">
+                            <div class="product-num">
+                                <em class="num-reduce" @click="good.gNum--">-</em>
+                                <input type="text" value="good.gNum" v-model="good.gNum" :input="isZero">
+                                <em class="num-add" @click="good.gNum++">+</em>
+                            </div>
+                        </td>
+                        <td class="td-total">
+                            <p class="product-total">￥<span>{{(good.gPrice*good.gNum).toFixed(2)}}</span></p>
+                        </td>
+                        <td class="td-opt" @click="deleteProduct(index)">删除</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="cart-footer">
+                <ul>
+                    <li class="delpart fl" @click="deletePart">删除已选中商品</li>
+                    <li class="settle fr" @click="commit">结算</li>
+                    <li class="subtotal fr">合计（不含运费）：<span>{{getTotal.price.toFixed(2)}}</span></li>
+                    <li class="piece fr">已选商品<span>{{getTotal.number}}</span>件</li>
+                </ul>
+            </div>
+        </div>
+
+
+    </div>
+
+    <script>
+        const vm = new Vue({
+            el: '#app',
+            data: {
+                goods: [
+                    {
+                        isCk: false,//是否选中
+                        gImg: 'https://img.alicdn.com/bao/uploaded/i2/343384638/TB2fH8KgpXXXXbxXXXXXXXXXXXX_!!343384638.png_80x80.jpg',//商品图片
+                        gTit: 'Razer雷蛇曼巴眼镜蛇竞技版升级幻彩5G电竞有线无线双模游戏鼠标',//商品名
+                        gSpec: '曼巴眼镜蛇升级版有线/无线双模',//规格
+                        gPrice: 1049.00,//单价
+                        gNum: 1//数量
+                    },
+                    {
+                        isCk: false,
+                        gImg: 'http://img3x4.ddimg.cn/66/24/22786104-1_m_1.jpg',
+                        gTit: '中文版Photoshop CS6完全自学教程(全新CS6升级版)',
+                        gSpec: '曼巴眼镜蛇升级版有线/无线双模',
+                        gPrice: 78.20,
+                        gNum: 1
+                    },
+                    {
+                        isCk: false,
+                        gImg: 'http://img3x7.ddimg.cn/0/4/25579917-1_m_1.jpg',
+                        gTit: '此生江湖聚散，你要敢爱敢当',
+                        gSpec: '购买此商品,可享促销 ',
+                        gPrice: 1049.00,
+                        gNum: 1
+                    },
+                    {
+                        isCk: false,
+                        gImg: 'http://img3x7.ddimg.cn/48/35/1184720277-1_m_2.jpg',
+                        gTit: '微信小程序：开发入门及案例详解',
+                        gSpec: ' 科技 > 计算机/网络 > 程序设计',
+                        gPrice: 1049.00,
+                        gNum: 1
+                    },
+                    {
+                        isCk: false,
+                        gImg: 'http://img3x9.ddimg.cn/10/3/1307967319-1_m_1.jpg',
+                        gTit: '马克笔套装TOUCH',
+                        gSpec: 'FIVE新5代36色-72色学生绘画彩色双头油性笔_白杆标准72色',
+                        gPrice: 1049.00,
+                        gNum: 1
+                    },
+                    {
+                        isCk: false,
+                        gImg: 'https://img.alicdn.com/bao/uploaded/i2/343384638/TB2fH8KgpXXXXbxXXXXXXXXXXXX_!!343384638.png_80x80.jpg',
+                        gTit: 'Razer雷蛇曼巴眼镜蛇竞技版升级幻彩5G电竞有线无线双模游戏鼠标',
+                        gSpec: '曼巴眼镜蛇升级版有线/无线双模',
+                        gPrice: 1049.00,
+                        gNum: 1
+                    }
+                ],
+                confirm: false,
+                cancel: false
+            },
+            watch: {},
+            computed: {
+                isCkAll: function(){//是否选中
+                    return this.goods.every(function(val){
+                        return val.isCk;
+                    })
+                },
+                getTotal: function () {//获取商品件数与总的支付额
+                    var goodsList = this.goods.filter(function (val) {
+                        return val.isCk
+                    }),totPrice= 0,num =0;
+                    for(let i= 0,len=goodsList.length;i<len;i++){
+                        totPrice += goodsList[i].gNum*goodsList[i].gPrice;
+                        num += goodsList[i].gNum;
+                    }
+                    return {number:num,price:totPrice}
+                }
+            },
+            methods:{
+                isZero: function () {//是否为0
+                    for(let i= 0,len=this.goods.length;i<len;i++){
+                        if(this.goods[i].gNum<0){
+                            this.goods[i].gNum = 0;
+                        }
+                    }
+                },
+                selectAll: function(isCkAll){//全选
+                    for(let i= 0,len=this.goods.length;i<len;i++){
+                        this.goods[i].isCk = !isCkAll;
+                    }
+                },
+                deleteProduct: function (index) {//删除单个产品
+                    this.goods.splice(index,1)
+                },
+                deletePart: function () {//删除选中的产品
+                    this.goods = this.goods.filter(function (item) {
+                        console.log(item.isCk);
+                        return !item.isCk;
+                    })
+                },
+                commit: function () {//提交结算
+                    if(this.getTotal.price !==0){
+                        return this.confirm = true;
+                    }
+                }
+            }
+        })
+    </script>
+</body>
+</html>
