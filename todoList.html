@@ -220,7 +220,7 @@
                 </li>
             </ul>
             <div class="goal-btn clearfix" v-if="addGoal.length>0">
-                <span class="fl" @click="finishedCk(addGoal)">已完成目标</span>
+                <span class="fl" @click="finishedCk">已完成目标</span>
                 <span class="fr" @click="deleteCk">删除已选目标</span>
             </div>
         </div>
@@ -271,10 +271,9 @@
                 isPortal: true,
                 addBtn: false,
                 submitGoals: false,
-                tempGoal: [],
                 newGoal: []
             },
-            mounted(){
+            mounted:function(){
                 this.newGoal = this.addGoal;
             },
             computed: {
@@ -302,22 +301,26 @@
                     return goal;
                 },
                 delGoal: function (index) {//删除某一条
-                    this.addGoal.splice(index,1)
+                    this.newGoal.splice(index,1);
                 },
                 finishedCk: function () {//完成已选按钮
-                    this.tempGoal.push(this.addGoal.filter(function(val){
-                        return val.isCk;
-                    }));
-                    for(let i=0;i<this.tempGoal.length;i++){
-                        this.tempGoal[i].every(function (item) {
-                            item.isFinished = true;console.log(item);
-                        });
-                    }
+                    (this.newGoal.filter(function (item) {
+                        return item.isCk
+                    })).forEach(function (value) {
+                        for(let key in value){
+                            if(value.hasOwnProperty(key)){
+                                if(key==='isFinished'){
+                                    return value[key]=true;
+                                }
+                            }
+                        }
+                    });
                 },
                 deleteCk: function () {//删除已选目标
-                    this.addGoal = this.addGoal.filter(function(val){
+                    this.newGoal = this.newGoal.filter(function(val){
                         return !val.isCk;
                     });
+                    this.addGoal = this.newGoal;
                 },
                 chooseType: function (type) {
                     switch (type){
