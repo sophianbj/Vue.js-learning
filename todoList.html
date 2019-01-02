@@ -268,16 +268,16 @@
             el: '#app',
             data: {
                 addGoal:[],
-                isPortal: true,
-                addBtn: false,
-                submitGoals: false,
+                isPortal: true,//判断是否为主面板
+                addBtn: false,//是否按下添加目标按钮
+                submitGoals: false,//添加目标后，提交按钮
                 newGoal: []
             },
-            mounted:function(){
+            mounted(){//挂载数据赋值
                 this.newGoal = this.addGoal;
             },
             computed: {
-                finishNum: function () {
+                finishNum: function () {//计算属性，计算已经完成目标的数目
                     return this.addGoal.filter(function (val) {
                         return val.isFinished
                     }).length;
@@ -305,12 +305,12 @@
                 },
                 finishedCk: function () {//完成已选按钮
                     (this.newGoal.filter(function (item) {
-                        return item.isCk
-                    })).forEach(function (value) {
-                        for(let key in value){
+                        return item.isCk //判定目标列表中选中的目标
+                    })).forEach(function (value) {//遍历选中的目标
+                        for(let key in value){//遍历目标对象
                             if(value.hasOwnProperty(key)){
                                 if(key==='isFinished'){
-                                    return value[key]=true;
+                                    return value[key]=true;//点击已完成切换值
                                 }
                             }
                         }
@@ -320,13 +320,13 @@
                     this.newGoal = this.newGoal.filter(function(val){
                         return !val.isCk;
                     });
-                    this.addGoal = this.newGoal;
+                    this.addGoal = this.newGoal; 
                 },
-                chooseType: function (type) {
+                chooseType: function (type) {//筛选按钮
                     switch (type){
                         case 1: this.newGoal = this.addGoal; break;//全选
-                        case 2: this.newGoal = this.addGoal.filter(function(item){return item.isFinished});break;
-                        case 3: this.newGoal = this.addGoal.filter(function(item){return !item.isFinished});break;
+                        case 2: this.newGoal = this.addGoal.filter(function(item){return item.isFinished});break;//已完成
+                        case 3: this.newGoal = this.addGoal.filter(function(item){return !item.isFinished});break;//待完成
 
                     }
                 }
